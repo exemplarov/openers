@@ -1,0 +1,9 @@
+{
+  "id": "openers",
+  "name": "Openers",
+  "version": "0.1.0",
+  "minAppVersion": "1.4.0",
+  "description": "One code block — one line of buttons that open a directory or file in Finder, the system terminal, or any CLI (zed, cursor, …). Global defaults, per-block overrides.",
+  "author": "Roman",
+  "isDesktopOnly": true
+}

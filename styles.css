@@ -1,0 +1,143 @@
+/* Openers — one code block, one line of open-in buttons. */
+
+/* Widget line -------------------------------------------------------------- */
+
+.openers {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px;
+  margin: 0.4em 0;
+}
+
+.openers-path {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1px 10px;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: var(--background-secondary);
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  line-height: 1.6;
+  max-width: 280px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.openers-path.is-missing {
+  border: 1px dashed var(--text-error);
+  background: transparent;
+  color: var(--text-faint);
+}
+
+.openers-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 1px 10px;
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 999px;
+  color: var(--text-muted);
+  font-size: var(--font-ui-smaller);
+  line-height: 1.6;
+  cursor: pointer;
+  user-select: none;
+  white-space: nowrap;
+}
+
+.openers-btn:hover {
+  border-color: var(--interactive-accent);
+  color: var(--text-normal);
+}
+
+.openers-btn:active {
+  border-color: var(--interactive-accent);
+  background: var(--background-modifier-hover);
+}
+
+.openers-icon {
+  display: inline-flex;
+  align-items: center;
+}
+
+.openers-icon svg {
+  width: 13px;
+  height: 13px;
+}
+
+/* Error card ---------------------------------------------------------------- */
+
+.openers-error {
+  border: 1px solid var(--text-error);
+  border-radius: 6px;
+  padding: 8px 12px;
+  color: var(--text-error);
+  font-size: var(--font-ui-small);
+}
+
+.openers-error-title {
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.openers-error-line {
+  font-family: var(--font-monospace);
+  font-size: 0.85em;
+}
+
+/* Settings — button cards -------------------------------------------------------- */
+
+.openers-settings-note {
+  color: var(--text-faint);
+  font-size: var(--font-ui-smaller);
+}
+
+.openers-card {
+  border: 1px solid var(--background-modifier-border);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 10px 0;
+}
+
+.openers-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.openers-card-kind {
+  font-weight: 600;
+  font-size: var(--font-ui-small);
+  color: var(--text-muted);
+  flex: 0 0 auto;
+}
+
+.openers-card-id {
+  font-family: var(--font-monospace);
+  font-size: var(--font-ui-smaller);
+  color: var(--text-faint);
+  flex: 0 0 auto;
+}
+
+.openers-card-header .openers-card-name {
+  flex: 1;
+  border: none;
+  padding: 0;
+}
+
+.openers-card-header .setting-item-info {
+  display: none;
+}
+
+.openers-card-header .openers-card-toggle,
+.openers-card-header .openers-card-delete {
+  border: none;
+  padding: 0;
+}
+
+.openers-card-field .setting-item-control input {
+  max-width: 320px;
+}
