@@ -1,6 +1,6 @@
 # Openers (Obsidian plugin)
 
-**Status: 0.1.0 — feature-complete v1: finder/terminal/cmd buttons, global
+**Status: 1.0.0 — feature-complete v1: finder/terminal/cmd buttons, global
 defaults + per-block merge, settings, public API.** Design:
 [`spec/001-architecture.md`](spec/001-architecture.md).
 

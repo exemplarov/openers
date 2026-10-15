@@ -10,7 +10,7 @@ const os = require("os");
 // (`zed <dir>`, `cursor <dir>`). Global settings define the default line;
 // blocks extend, override or disable it. See spec/001-architecture.md.
 //
-// Phase status: 2 (0.1.0) — parser with nested maps, path resolution,
+// Phase status: 2 (1.0.0) — parser with nested maps, path resolution,
 // global/block merge, finder/terminal/cmd actions, settings tab, public API.
 // ---------------------------------------------------------------------------
 

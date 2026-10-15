@@ -2,7 +2,7 @@
 
 Status: implemented
 Date: 2026-09-07
-Applies to: openers ≥ 0.1.0
+Applies to: openers ≥ 1.0.0
 Convention: sibling of `opencode-sessions` and `viz` — single-file `main.js`,
 hand-written ES2022, no build step (`node --check main.js`), desktop-only,
 spec-first.
