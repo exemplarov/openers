@@ -11,7 +11,7 @@ Module._load = function (request, ...args) {
 };
 const src =
   fs.readFileSync(path.join(__dirname, "..", "..", "main.js"), "utf8") +
-  "\nmodule.exports = { parseBlockConfig, parseScalar, parseValue, mergeButtons, resolveWidgetPath, splitCommandTokens, buildCommand, normalizeSettingsButton, terminalCommand, DEFAULT_BUTTONS, capitalize };";
+  "\nmodule.exports = { parseBlockConfig, parseScalar, parseValue, mergeButtons, resolveWidgetPath, splitCommandTokens, buildCommand, normalizeSettingsButton, terminalCommand, statTarget, createTargetDir, DEFAULT_BUTTONS, capitalize };";
 const m = { exports: {} };
 new Function("module", "exports", "require", src)(m, m.exports, (r) => Module._load(r));
 const O = m.exports;
@@ -158,6 +158,8 @@ ok("resolve: neither = error", O.resolveWidgetPath({}, ctx).errors.some((e) => /
 ok("resolve: real dir detected", (() => { const r = O.resolveWidgetPath({ dir: tmp }, ctx).target; return r.exists === true && r.isDir === true; })());
 ok("resolve: real file detected", (() => { const r = O.resolveWidgetPath({ file: tmpFile }, ctx).target; return r.exists === true && r.isDir === false; })());
 ok("resolve: missing marked", O.resolveWidgetPath({ dir: path.join(tmp, "nope") }, ctx).target.exists === false);
+ok("resolve: file target flagged", O.resolveWidgetPath({ file: path.join(tmp, "nope.md") }, ctx).target.fileTarget === true);
+ok("resolve: dir target unflagged", O.resolveWidgetPath({ dir: path.join(tmp, "nope") }, ctx).target.fileTarget === false);
 fs.rmSync(tmp, { recursive: true, force: true });
 
 // --- command tokenizer & buildCommand -------------------------------------------
@@ -187,6 +189,20 @@ const tc = O.terminalCommand({ app: "" }, "/some/dir");
 ok("terminal: darwin default app", tc.bin === "/usr/bin/open" && eq(tc.args, ["-a", "Terminal", "/some/dir"]));
 const tc2 = O.terminalCommand({ app: "iTerm" }, "/some/dir");
 ok("terminal: darwin custom app", eq(tc2.args, ["-a", "iTerm", "/some/dir"]));
+
+// --- create-dir (missing-dir affordance) ------------------------------------------
+
+const tmp2 = fs.mkdtempSync(path.join(os.tmpdir(), "openers-fx-"));
+const nestedDir = path.join(tmp2, "a/b/c");
+ok("stat: missing nested path", O.statTarget(nestedDir).exists === false);
+const created = { path: nestedDir, fileTarget: false, exists: false, isDir: false };
+ok("create: recursive mkdir succeeds + refreshes target", O.createTargetDir(created) === true && created.exists === true && created.isDir === true);
+ok("stat: agrees after create", O.statTarget(nestedDir).exists === true && O.statTarget(nestedDir).isDir === true);
+ok("create: existing dir is a no-op success", O.createTargetDir({ path: nestedDir }) === true);
+const asFile = path.join(tmp2, "plain");
+fs.writeFileSync(asFile, "x");
+ok("create: dir under a file fails, not throws", O.createTargetDir({ path: path.join(asFile, "sub") }) === false);
+fs.rmSync(tmp2, { recursive: true, force: true });
 
 console.log(failed ? `\n${failed} FAILURES` : "\nall green");
 process.exit(failed ? 1 : 0);

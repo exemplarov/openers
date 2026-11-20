@@ -58,6 +58,20 @@
   background: var(--background-modifier-hover);
 }
 
+/* Create-dir — the one highlighted pill on a missing-dir line */
+
+.openers-btn.is-create {
+  border-color: var(--interactive-accent);
+  color: var(--text-accent);
+}
+
+.openers-btn.is-create:hover,
+.openers-btn.is-create:active {
+  background: var(--interactive-accent);
+  border-color: var(--interactive-accent);
+  color: var(--text-on-accent);
+}
+
 .openers-icon {
   display: inline-flex;
   align-items: center;

@@ -1,8 +1,8 @@
 # Openers (Obsidian plugin)
 
-**Status: 1.0.0 — feature-complete v1: finder/terminal/cmd buttons, global
-defaults + per-block merge, settings, public API.** Design:
-[`spec/001-architecture.md`](spec/001-architecture.md).
+**Status: 1.1.0 — v1 (finder/terminal/cmd buttons, global defaults + per-block
+merge, settings, public API) + create-dir button for missing dir
+targets.** Design: [`spec/001-architecture.md`](spec/001-architecture.md).
 
 One [Obsidian](https://obsidian.md) code block — **one line of buttons that
 open a directory or file elsewhere on the machine**: the file manager
@@ -61,7 +61,10 @@ containing folder for file targets, Finder reveals and selects the file.
   `~/.local/bin`, `~/bin`, then `PATH`; failures surface as actionable
   Notices.
 - **Missing paths degrade visibly** — dashed path chip, click explains
-  itself.
+  itself. Missing **dir** targets additionally get a highlighted
+  **create dir** button at the head of the line: one click runs the
+  equivalent of `mkdir -p` (nested paths included) and the widget
+  re-renders live — chip solidifies, buttons go hot.
 
 ## Settings
 

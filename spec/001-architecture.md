@@ -98,7 +98,8 @@ Path rules: absolute, `~`-expanded, `file://` URLs accepted
 (paste-migration), anything else resolves against the vault root.
 Existence is checked at render; a missing path renders dimmed/dashed and
 clicks explain themselves (Notice), so renamed dirs degrade visibly
-instead of silently.
+instead of silently. A missing **dir** target additionally gets a
+highlighted create button (§7).
 
 ### 4.3 Merge semantics
 
@@ -182,6 +183,12 @@ Terminals cannot open files: a file target opens its **parent dir**.
   + one pill button per merged button (optional lucide icon via
   `setIcon`, label, `title` = the exact command it runs).
 - Missing target: path chip dashed/error-tinted, `title` notes it.
+  Missing **dir** targets (not `file:` ones) also get a highlighted
+  `create dir` button prepended to the line — icon `folder-plus`,
+  `title` = `mkdir -p <path>`. Click runs the recursive mkdir, refreshes
+  the stat and re-renders in place (chip solidifies, create button gone,
+  regular buttons live); failures (permissions, path under a file, …)
+  surface as a Notice. Existing dirs are a no-op success.
 - Config errors (no `dir:`/`file:`, both, bad `buttons:`, …) render the
   sibling-style inline error card.
 - `MarkdownRenderChild` via `ctx.addChild`; nothing to tear down (no
@@ -193,7 +200,9 @@ Terminals cannot open files: a file target opens its **parent dir**.
 Notes run local executables by design — same local-trust model as viz's
 SQL blocks. Mitigations: no shell interpolation (argv arrays only),
 paths from the note are never executed themselves, spawning is
-user-initiated (click), and error paths are Notices, not silent.
+user-initiated (click), and error paths are Notices, not silent. The
+only write action is `mkdir -p` behind the explicit create button —
+likewise click-initiated, never on render.
 
 ## 9. Public API (`globalThis.openers`, version 1)
 

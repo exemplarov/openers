@@ -29,7 +29,8 @@ buttons:
 ```
 
 Inline flow form, `{path}` placement, and a deliberately missing path
-(dashed chip; clicks explain):
+(dashed chip + highlighted create-dir button — recursive mkdir, then the
+line goes live; clicks on the other buttons explain while it's missing):
 
 ```openers
 dir: /definitely/not/here

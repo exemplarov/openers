@@ -10,8 +10,9 @@ const os = require("os");
 // (`zed <dir>`, `cursor <dir>`). Global settings define the default line;
 // blocks extend, override or disable it. See spec/001-architecture.md.
 //
-// Phase status: 2 (1.0.0) — parser with nested maps, path resolution,
-// global/block merge, finder/terminal/cmd actions, settings tab, public API.
+// Phase status: 2 (1.1.0) — parser with nested maps, path resolution,
+// global/block merge, finder/terminal/cmd actions, settings tab, public API;
+// missing dir targets offer an inline create button (recursive mkdir).
 // ---------------------------------------------------------------------------
 
 const BLOCK_LANGUAGE = "openers";
@@ -229,6 +230,15 @@ function parseBlockConfig(source) {
 // `~` expansion, `file://` URL decode, vault-relative fallback, existence.
 // ---------------------------------------------------------------------------
 
+// Existence probe shared by render and the create-dir refresh.
+function statTarget(p) {
+  try {
+    return { exists: true, isDir: fs.statSync(p).isDirectory() };
+  } catch {
+    return { exists: false, isDir: false };
+  }
+}
+
 function resolveWidgetPath(config, ctx) {
   const errors = [];
   const dir = config.dir;
@@ -252,14 +262,7 @@ function resolveWidgetPath(config, ctx) {
   else if (p.startsWith("~/")) p = path.join(ctx.home || "", p.slice(2));
   else if (!path.isAbsolute(p)) p = path.join(ctx.vaultRoot || "", p);
   p = path.normalize(p);
-  let exists = true;
-  let isDir = false;
-  try {
-    isDir = fs.statSync(p).isDirectory();
-  } catch {
-    exists = false;
-  }
-  return { errors, target: { path: p, exists, isDir } };
+  return { errors, target: Object.assign({ path: p, fileTarget: file != null }, statTarget(p)) };
 }
 
 // ---------------------------------------------------------------------------
@@ -487,6 +490,19 @@ async function runButtonAction(button, target) {
   }
 }
 
+// Missing-dir affordance: recursive mkdir, then the caller re-renders from
+// the refreshed stat. Failure surfaces as a Notice (EACCES, ENOTDIR, …).
+function createTargetDir(target) {
+  try {
+    fs.mkdirSync(target.path, { recursive: true });
+  } catch (error) {
+    new Notice(`openers: create dir: ${error.message}`, 8000);
+    return false;
+  }
+  Object.assign(target, statTarget(target.path));
+  return true;
+}
+
 function describeButton(button, target) {
   try {
     if (button.kind === "finder") return target.isDir ? `open ${target.path}` : `reveal ${target.path}`;
@@ -563,6 +579,22 @@ class OpenersWidget extends MarkdownRenderChild {
     });
     if (this.target.exists) this.renderIcon(chip, this.target.isDir ? "folder" : "file");
 
+    // Missing dir target — highlighted create button ahead of the line
+    // (spec §7): click = recursive mkdir + re-render; the chip solidifies
+    // and the regular buttons go live.
+    if (!this.target.exists && !this.target.fileTarget) {
+      const create = line.createSpan({ cls: "openers-btn is-create", attr: { role: "button", tabindex: "0" } });
+      this.renderIcon(create, "folder-plus");
+      create.createSpan({ cls: "openers-btn-label" }, (el) => {
+        el.textContent = "create dir";
+      });
+      create.title = `mkdir -p ${this.target.path}`;
+      this.bindActivate(create, (event) => {
+        event.preventDefault();
+        if (this.plugin.createTargetDir(this.target)) this.render();
+      });
+    }
+
     for (const button of this.buttons) {
       const btn = line.createSpan({ cls: "openers-btn", attr: { role: "button", tabindex: "0" } });
       this.renderIcon(btn, button.icon);
@@ -570,15 +602,18 @@ class OpenersWidget extends MarkdownRenderChild {
         el.textContent = button.name || button.id;
       });
       btn.title = describeButton(button, this.target);
-      const activate = (event) => {
+      this.bindActivate(btn, (event) => {
         event.preventDefault();
         this.plugin.runButton(button, this.target);
-      };
-      btn.addEventListener("click", activate);
-      btn.addEventListener("keydown", (event) => {
-        if (event.key === "Enter" || event.key === " ") activate(event);
       });
     }
+  }
+
+  bindActivate(el, activate) {
+    el.addEventListener("click", activate);
+    el.addEventListener("keydown", (event) => {
+      if (event.key === "Enter" || event.key === " ") activate(event);
+    });
   }
 
   renderIcon(parent, name) {
@@ -797,6 +832,10 @@ class OpenersPlugin extends Plugin {
 
   runButton(button, target) {
     runButtonAction(button, target);
+  }
+
+  createTargetDir(target) {
+    return createTargetDir(target);
   }
 
   openWith(rawPath, id) {
